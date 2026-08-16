@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#E94F60">
+<title>Flörtöz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!--
+  REKLAM (Google AdSense) KURULUMU:
+  1) https://www.google.com/adsense üzerinden bir yayıncı hesabı aç ve site/uygulamanı onaylat.
+  2) Sana verilen "client" kodunu ("ca-pub-XXXXXXXXXXXXXXXX") aşağıdaki satırdaki YOUR_CLIENT_ID yerine yaz
+     ve script etiketindeki yorum işaretini kaldır.
+  3) Her .ad-slot içindeki <ins> etiketindeki data-ad-slot değerini AdSense panelinden oluşturduğun
+     reklam biriminin slot ID'siyle değiştir.
+  4) Bu uygulamayı Play Store'a TWA ile gönderirsen bu reklamlar gerçek web reklamı olarak çalışır.
+-->
+<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_CLIENT_ID" crossorigin="anonymous"></script> -->
+<style>
+  :root{
+    --cream:#FBF3EA;
+    --paper:#FFFFFF;
+    --ink:#2E2A26;
+    --ink-soft:#6B6259;
+    --ink-faint:#A79E92;
+    --dawn:#E8A672;
+    --dawn-deep:#C97B44;
+    --dusk:#4B5372;
+    --dusk-deep:#333A54;
+    --dusk-light:#E4E6EE;
+    --rose:#C97B84;
+    --rose-deep:#93505A;
+    --rose-light:#F2DCDD;
+    --sage:#8CA688;
+    --sage-light:#E4EDE1;
+    --teal:#3F8F86;
+    --teal-deep:#265650;
+    --teal-light:#DCEEEC;
+    --amber:#D99A3D;
+    --amber-deep:#8C5F1D;
+    --amber-light:#FBEAD1;
+    --lavender:#8874B0;
+    --lavender-deep:#54426F;
+    --lavender-light:#EBE4F5;
+    --coral:#E0704F;
+    --coral-deep:#A84B2E;
+    --coral-light:#FBE1D6;
+    --line:#E7DDCF;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 10% 8%, rgba(232,166,114,0.32), transparent 42%),
+      radial-gradient(circle at 92% 4%, rgba(201,123,132,0.28), transparent 40%),
+      radial-gradient(circle at 85% 45%, rgba(63,143,134,0.16), transparent 45%),
+      radial-gradient(circle at 6% 60%, rgba(136,116,176,0.16), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(217,154,61,0.18), transparent 45%),
+      var(--cream);
+    background-attachment:fixed;
+  }
+  .app{
+    font-family:'Manrope',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding:0 0 3rem;
+  }
+  .sky{ position:relative; height:150px; overflow:hidden; border-radius:0 0 28px 28px; }
+  .sky-arc{position:absolute;inset:0;}
+  .sky-body{ position:absolute; width:30px;height:30px; border-radius:50%; top:50%;left:50%; box-shadow:0 0 0 6px rgba(255,255,255,0.18); }
+  .sky-label{ position:absolute; left:24px; top:22px; color:#fff; }
+  .sky-label .eyebrow{ font-size:12px; letter-spacing:0.14em; text-transform:uppercase; opacity:0.75; margin:0 0 6px; }
+  .sky-label h1{ font-family:'Fraunces',serif; font-weight:500; font-size:30px; margin:0; }
+  .sky-label p{ margin:6px 0 0; font-size:13.5px; opacity:0.85; max-width:300px; line-height:1.5; }
+  .wrap{ max-width:640px; margin:0 auto; padding:0 20px; }
+  .tabs{
+    display:flex; gap:6px; margin:20px 0 22px;
+    background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:5px;
+    overflow-x:auto; -ms-overflow-style:none; scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:0 0 auto; text-align:center; padding:9px 15px; border-radius:999px;
+    font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer; user-select:none;
+    white-space:nowrap; transition:background .15s, color .15s;
+  }
+  .tab.active{ background:var(--tab-accent, var(--rose)); color:#fff; }
+  #tab-mesajlar.active{ --tab-accent:var(--amber-deep); }
+  #tab-mekan.active{ --tab-accent:var(--coral-deep); }
+  #tab-hediye.active{ --tab-accent:var(--teal-deep); }
+  #tab-gunler.active{ --tab-accent:var(--lavender-deep); }
+  #tab-regl.active{ --tab-accent:var(--rose-deep); }
+  .panel{display:none;}
+  .panel.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+  .card{ background:var(--paper); border:1px solid var(--line); border-top:4px solid var(--card-accent, var(--line)); border-radius:var(--radius); padding:22px 22px 20px; margin-bottom:16px; box-shadow:0 6px 18px rgba(147,80,90,0.06); }
+  .card-eyebrow{ font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--rose-deep); font-weight:700; margin:0 0 10px; }
+  .message-text{ font-family:'Fraunces',serif; font-style:italic; font-size:21px; line-height:1.5; color:var(--ink); margin:0 0 18px; min-height:64px; }
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  button{
+    font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:600; border-radius:999px;
+    padding:10px 18px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    cursor:pointer; transition:background .15s, border-color .15s, transform .1s;
+  }
+  button:active{transform:scale(0.97);}
+  button.primary{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  button.rose{ background:var(--rose); color:#fff; border-color:var(--rose); }
+  button.sage{ background:var(--sage); color:#fff; border-color:var(--sage); }
+  button.ghost:hover{background:var(--cream);}
+  button.icon-only{ padding:10px 12px; font-size:15px; line-height:1; }
+  button:disabled{ opacity:0.45; cursor:default; }
+  .heart-btn.active{ background:var(--rose-light); border-color:var(--rose); color:var(--rose-deep); }
+  .streaks{ display:flex; gap:12px; margin-top:4px; }
+  .streak-pill{ flex:1; background:var(--cream); border-radius:12px; padding:12px 14px; }
+  .streak-pill .n{ font-family:'Fraunces',serif; font-size:22px; font-weight:500; }
+  .streak-pill .l{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; font-size:13.5px; font-weight:600; padding:11px 20px;
+    border-radius:999px; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:50;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .section-title{ font-family:'Fraunces',serif; font-weight:500; font-size:20px; margin:26px 0 12px; display:flex; align-items:center; gap:8px; }
+  .section-title:first-child{margin-top:0;}
+  .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .lib-item{ display:flex; align-items:flex-start; gap:12px; padding:14px 0; border-bottom:1px solid var(--line); }
+  .lib-item:last-child{border-bottom:none;}
+  .lib-item p{ flex:1; margin:0; font-size:15px; line-height:1.5; }
+  .lib-actions{display:flex; gap:6px; flex-shrink:0;}
+  .cat-pills{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+  .cat-pill{ padding:8px 16px; border-radius:999px; border:1px solid var(--line); background:var(--paper); font-size:13px; font-weight:600; cursor:pointer; color:var(--ink-soft); }
+  .cat-pill.active{ background:var(--pill-accent, var(--dusk)); border-color:var(--pill-accent, var(--dusk)); color:#fff; }
+  .idea-item{ padding:13px 0; border-bottom:1px solid var(--line); font-size:15px; line-height:1.5; }
+  .idea-item:last-child{border-bottom:none;}
+  .idea-item b{font-weight:600;}
+  .empty{ text-align:center; padding:40px 20px; color:var(--ink-soft); }
+  .empty p{font-size:14px; margin:6px 0 0;}
+  .note{ font-size:12.5px; color:var(--ink-faint); line-height:1.6; margin-top:18px; padding-top:14px; border-top:1px solid var(--line); }
+  label.field-label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin:0 0 6px; }
+  input[type=text], input[type=number], input[type=date], input[type=time], select{
+    width:100%; font-family:'Manrope',sans-serif; font-size:14px; padding:10px 12px;
+    border:1px solid var(--line); border-radius:10px; background:var(--cream); color:var(--ink);
+  }
+  .field{margin-bottom:14px;}
+  .field-row{display:flex; gap:12px; flex-wrap:wrap;}
+  .field-row .field{flex:1; min-width:110px;}
+  .chip-select{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{ padding:8px 14px; border-radius:999px; border:1px solid var(--line); font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer; background:var(--paper); }
+  .chip.active{ background:var(--teal); border-color:var(--teal); color:#fff; }
+  .place-card{ padding:16px 0; border-bottom:1px solid var(--line); }
+  .place-card:last-child{border-bottom:none;}
+  .place-title{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .place-title h3{ font-family:'Fraunces',serif; font-weight:500; font-size:17px; margin:0; }
+  .place-rating{ font-size:13px; font-weight:700; color:var(--coral-deep); white-space:nowrap; }
+  .place-meta{ display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
+  .meta-pill{ font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:999px; background:var(--coral-light); color:var(--coral-deep); }
+  .place-desc{ font-size:13.5px; color:var(--ink-soft); line-height:1.5; margin:0 0 8px; }
+  .place-link{ font-size:13px; font-weight:600; color:var(--coral-deep); text-decoration:none; }
+  .day-row{ display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--line); gap:10px; }
+  .day-row:last-child{border-bottom:none;}
+  .day-row .info p{margin:0;}
+  .day-row .info .t{font-weight:600; font-size:14.5px;}
+  .day-row .info .d{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .day-row .countdown{ font-family:'Fraunces',serif; font-size:19px; text-align:right; white-space:nowrap; color:var(--lavender-deep); }
+  .day-row .countdown .u{ font-family:'Manrope',sans-serif; font-size:11px; color:var(--ink-soft); display:block; }
+  .cycle-status{ background:var(--rose-light); border-radius:12px; padding:16px; margin-bottom:16px; }
+  .cycle-status.calm{ background:var(--teal-light); }
+  .cycle-status h3{ font-family:'Fraunces',serif; font-weight:500; font-size:17px; margin:0 0 4px; color:var(--rose-deep); }
+  .cycle-status.calm h3{ color:var(--teal-deep); }
+  .cycle-status p{ font-size:13.5px; color:var(--ink-soft); margin:0; }
+  .gift-badge{ font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:999px; background:var(--teal-light); color:var(--teal-deep); }
+  .ad-slot{
+    margin:8px 0 16px;
+    border:1.5px dashed var(--line);
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+    background:rgba(255,255,255,0.5);
+  }
+  .ad-slot .ad-label{ font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin:0 0 6px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="sky">
+    <svg class="sky-arc" id="skyArc" width="100%" height="150" viewBox="0 0 640 150" preserveAspectRatio="none"></svg>
+    <div class="sky-body" id="skyBody"></div>
+    <div class="sky-label">
+      <p class="eyebrow" id="dayPart">Günün ritmi</p>
+      <h1>Flörtöz</h1>
+      <p>Dünya işi araya girse de sevdiğine her sabah ve her akşam ulaş.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="tabs">
+      <div class="tab active" id="tab-bugun" data-tab="bugun">Bugün</div>
+      <div class="tab" id="tab-mesajlar" data-tab="mesajlar">Mesajlar</div>
+      <div class="tab" id="tab-mekan" data-tab="mekan">Mekan</div>
+      <div class="tab" id="tab-hediye" data-tab="hediye">Hediye</div>
+      <div class="tab" id="tab-gunler" data-tab="gunler">Özel Günler</div>
+      <div class="tab" id="tab-regl" data-tab="regl">Regl Takvimi</div>
+      <div class="tab" id="tab-favoriler" data-tab="favoriler">Favoriler</div>
+    </div>
+
+    <div class="panel active" id="panel-bugun">
+      <div class="card" id="bugunCard" style="--card-accent:var(--amber);">
+        <p class="card-eyebrow" id="bugunEyebrow">Günaydın mesajı</p>
+        <p class="message-text" id="bugunMesaj"></p>
+        <div class="row">
+          <button class="ghost" id="btnShuffle">Başka öner</button>
+          <button class="ghost icon-only heart-btn" id="btnFavToday" aria-label="Favorile">♡</button>
+          <button class="primary" id="btnCopy">Kopyala</button>
+          <button class="rose" id="btnSent">Bugün gönderdim</button>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:var(--teal);">
+        <p class="card-eyebrow" style="color:var(--teal-deep);">Süreklilik</p>
+        <div class="streaks">
+          <div class="streak-pill"><div class="n" id="streakGunaydin">0</div><div class="l">günaydın serisi</div></div>
+          <div class="streak-pill"><div class="n" id="streakGunici">0</div><div class="l">gün içi serisi</div></div>
+          <div class="streak-pill"><div class="n" id="streakIyigece">0</div><div class="l">iyi geceler serisi</div></div>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:var(--lavender);">
+        <p class="card-eyebrow" style="color:var(--lavender-deep);">Hatırlatıcı saatleri</p>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Günaydın saati</label><input type="time" id="morningTime" value="08:00"></div>
+          <div class="field"><label class="field-label">Gün içi saati</label><input type="time" id="dayTime" value="14:00"></div>
+          <div class="field"><label class="field-label">İyi geceler saati</label><input type="time" id="nightTime" value="22:00"></div>
+        </div>
+        <div class="row">
+          <button class="sage" id="btnNotif">Bildirimleri aç</button>
+          <span id="notifStatus" style="font-size:12.5px; color:var(--ink-soft);"></span>
+        </div>
+        <p class="note">Bildirimler yalnızca bu sayfa tarayıcında açık kaldığı sürece çalışır — telefonun kilitliyken ya da uygulama kapalıyken gerçek bir anlık bildirim gönderemem. Belirlediğin saat geldiğinde sekme açıksa hem tarayıcı bildirimi hem de bu ekranda uyarı çıkar. Mesajı yine sen kopyalayıp WhatsApp veya SMS'ten yolluyorsun.</p>
+      </div>
+      <div class="ad-slot">
+        <p class="ad-label">Reklam</p>
+        <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-YOUR_CLIENT_ID" data-ad-slot="YOUR_AD_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+      </div>
+    </div>
+
+    <div class="panel" id="panel-mesajlar">
+      <div id="libraryContainer"></div>
+    </div>
+
+    <div class="panel" id="panel-mekan">
+      <p class="section-title">İstanbul'da buluşma mekanları</p>
+      <div class="cat-pills" id="mekanCats"></div>
+      <div class="card" id="mekanList" style="--card-accent:var(--coral);"></div>
+      <p class="note">Puanlar ve fiyat seviyeleri Google Haritalar üzerinden Ağustos 2026 itibarıyla derlendi, zamanla değişebilir. Yoğunluk notları ziyaretçi yorumlarına dayanan genel bir tahmindir, garanti değildir. Başka bir şehir için öneri istersen sohbette söylemen yeterli.</p>
+      <div class="ad-slot">
+        <p class="ad-label">Reklam</p>
+        <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-YOUR_CLIENT_ID" data-ad-slot="YOUR_AD_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+      </div>
+    </div>
+
+    <div class="panel" id="panel-hediye">
+      <div class="card" style="--card-accent:var(--teal);">
+        <p class="card-eyebrow" style="color:var(--teal-deep);">Kimin için?</p>
+        <div class="field-row">
+          <div class="field"><label class="field-label">İsim</label><input type="text" id="giftName" placeholder="Örn. Ayşe"></div>
+          <div class="field"><label class="field-label">Yaş</label><input type="number" id="giftAge" placeholder="Örn. 27" min="1" max="120"></div>
+        </div>
+        <div class="field"><label class="field-label">Boy (cm, isteğe bağlı — kıyafet bedeni için)</label><input type="number" id="giftHeight" placeholder="Örn. 165"></div>
+        <div class="field">
+          <label class="field-label">Nelerden hoşlanıyor?</label>
+          <div class="chip-select" id="giftInterests"></div>
+        </div>
+        <div class="field">
+          <label class="field-label">Bütçe</label>
+          <div class="chip-select" id="giftBudget"></div>
+        </div>
+        <button class="primary" id="btnGiftSuggest">Öneri getir</button>
+      </div>
+      <div id="giftResults"></div>
+    </div>
+
+    <div class="panel" id="panel-gunler">
+      <div class="card" style="--card-accent:var(--lavender);">
+        <p class="card-eyebrow" style="color:var(--lavender-deep);">Yeni özel gün ekle</p>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Ne için?</label><input type="text" id="dayTitle" placeholder="Örn. Doğum günü, ilk buluşma"></div>
+          <div class="field"><label class="field-label">Tarih</label><input type="date" id="dayDate"></div>
+        </div>
+        <button class="primary" id="btnAddDay">Ekle</button>
+      </div>
+      <div id="daysContainer"></div>
+    </div>
+
+    <div class="panel" id="panel-regl">
+      <div class="card" style="--card-accent:var(--rose);">
+        <p class="card-eyebrow">Regl takvimi</p>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Son regl başlangıcı</label><input type="date" id="cycleStart"></div>
+          <div class="field"><label class="field-label">Döngü uzunluğu (gün)</label><input type="number" id="cycleLength" value="28" min="20" max="40"></div>
+        </div>
+        <div class="field"><label class="field-label">Regl süresi (gün)</label><input type="number" id="periodLength" value="5" min="2" max="10"></div>
+        <button class="primary" id="btnCycleSave">Kaydet</button>
+      </div>
+      <div id="cycleStatus"></div>
+      <div class="card" style="--card-accent:var(--rose);">
+        <p class="card-eyebrow">Bu dönemde nasıl davranmalı</p>
+        <div id="cycleTips"></div>
+        <p class="note">Bu takvim tahminidir, tıbbi bir araç değildir. Ağrı, düzensizlik ya da endişe varsa doğrudan kendisinin bir sağlık uzmanına danışması en doğrusu.</p>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-favoriler">
+      <div id="favContainer"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const gunaydin = [
+  "Günaydın canım, bugün de seninle aynı gökyüzünün altında olmak güzel.",
+  "Gözlerimi açar açmaz seni düşündüm, günaydın aşkım.",
+  "Bugün güzel bir gün olacak çünkü sen varsın. Günaydın.",
+  "Uyandığımda ilk aklıma gelen sen oldun, iyi ki varsın. Günaydın.",
+  "Güne gülümseyerek başla, ben zaten seninle gülümsüyorum. Günaydın.",
+  "Kahveni yudumlarken beni de düşün, günaydın güzelim.",
+  "Bugün ne olursa olsun yanındayım, günaydın hayatım.",
+  "Seninle güne başlamak en güzel alışkanlığım. Günaydın.",
+  "Umarım günün senin kadar güzel geçer. Günaydın aşkım.",
+  "Uzaktan da olsa sana sarılıyorum, günaydın canım.",
+  "Gün ışığı senin gülüşünün yanında sönük kalır. Günaydın.",
+  "Bugün de listeme seni düşünmeyi ilk sıraya yazdım. Günaydın canım.",
+  "Uyanır uyanmaz sana yazmak en güzel alışkanlığım oldu. Günaydın aşkım.",
+  "Bugün kendine iyi bak, ben seni buradan düşünüyorum. Günaydın.",
+  "Hayatımda seninle başlayan her gün daha anlamlı. Günaydın sevgilim."
+];
+const iyigeceler = [
+  "Günün nasıl geçerse geçsin, şimdi iyi uykular zamanı. İyi geceler canım.",
+  "Yastığına başını koyarken benim sevgimi de yanına al. İyi geceler.",
+  "Bugün seni düşünmediğim tek bir an olmadı, iyi geceler aşkım.",
+  "Rüyalarında da yanında olayım, iyi geceler güzelim.",
+  "Yorgunluğun geçsin, yerine huzur gelsin. İyi geceler hayatım.",
+  "Seni son düşüncem yaparak uyuyacağım, iyi geceler.",
+  "Uzakta da olsak aynı yıldızların altındayız, iyi geceler canım.",
+  "Bugün için teşekkürler, yarın için sabırsızım. İyi geceler aşkım.",
+  "Gözlerin kapanmadan önce bil ki seni çok seviyorum. İyi geceler.",
+  "Güzel rüyalar seni beklesin, iyi geceler sevgilim.",
+  "Bugün ne kadar yorucu geçerse geçsin, sonu sana ulaşmakla bitiyor. İyi geceler.",
+  "Telefonu bırakmadan önce bil ki bugün de seninle gurur duydum. İyi geceler canım.",
+  "Uykuya dalarken aklında sadece huzur olsun. İyi geceler aşkım.",
+  "Sabah tekrar seninle güne başlamak için sabırsızlanıyorum. İyi geceler hayatım.",
+  "Bugünü kapatırken son sözüm sana: iyi ki varsın. İyi geceler."
+];
+const iltifat = [
+  "Gülüşün günümü kurtarıyor, farkında mısın?",
+  "Seninle konuşurken zaman nasıl geçiyor anlamıyorum.",
+  "Sen olmasan hayatım bu kadar renkli olmazdı.",
+  "En sevdiğim şey senin bana bakış şeklin.",
+  "Yanımda olduğunda her şey daha kolay geliyor.",
+  "Sen benim en güzel tesadüfümsün.",
+  "Kalbin kadar güzel bir insan tanımadım.",
+  "Seninle her şey daha anlamlı geliyor.",
+  "Gözlerine bakınca huzur buluyorum.",
+  "Sen benim şanslı günümsün, her gün.",
+  "Küçük detaylara verdiğin önem beni her seferinde şaşırtıyor.",
+  "Zor bir günün ortasında bile beni düşünmen çok değerli.",
+  "Seninle her sohbet, günün en güzel kısmı oluyor.",
+  "Kararlılığın ve şefkatin bir arada olması nadir bulunur.",
+  "Sana bakıp iyi ki tanışmışız demek hiç eskimiyor."
+];
+const sohbet = [
+  "Bugün seni en çok ne güldürdü?",
+  "Hayalindeki tatil nereye olurdu, birlikte gidelim mi?",
+  "Bugün aklından ne geçti de bana söylemedin?",
+  "En sevdiğin anımız hangisiydi, merak ettim.",
+  "Bu hafta sonu ne yapmak istersin?",
+  "Sana bir şey itiraf edeceğim, hazır mısın?",
+  "Birlikte denemediğimiz ama denemek istediğin bir şey var mı?",
+  "Bugün nasıl geçti, anlatsana.",
+  "Seni son zamanlarda en çok ne mutlu ediyor?",
+  "Hayalindeki akşam yemeği neye benzer?",
+  "Küçükken olmak istediğin şey neydi, hâlâ öyle mi hissediyorsun?",
+  "Bugün için minnettar olduğun bir şey var mı?",
+  "Hangi şehirde yaşamayı hayal ederdin?",
+  "Bir günlüğüne süper gücün olsa ne yapardın?",
+  "Bana hiç anlatmadığın bir çocukluk anın var mı?"
+];
+const gunIci = [
+  "Sevgi, günün ortasında bile birini durup düşünmektir.",
+  "En güzel mesajlar, hiçbir sebep yokken atılanlardır.",
+  "Biri seni düşünüyor, işte bu kadar basit.",
+  "Aşk, meşgul bir günün ortasında bile yer açabilmektir.",
+  "Bugün ne yaparsan yap, bir yerinde bana da yer aç.",
+  "Uzakta olmak, aklımda olmadığın anlamına gelmiyor.",
+  "Bazen bir kelime, koca bir günü değiştirmeye yeter.",
+  "Seni düşünmek için özel bir sebebe ihtiyacım yok.",
+  "En güzel aralar, birini hatırladığın anlardır.",
+  "Gün ne kadar yoğun geçerse geçsin, sana ayırdığım bir dakika var.",
+  "İyi ki varsın demek için sabahı ya da akşamı beklemek gerekmiyor.",
+  "Küçük bir hatırlatma: bugün de seviliyorsun."
+];
+
+const activities = [
+  ["Doğa yürüyüşü", "Telefonları bir kenara bırakıp sohbet etme fırsatı."],
+  ["Yemek pişirme kursu", "Birlikte yeni bir şey öğrenmek bağı güçlendirir."],
+  ["Müze veya sergi gezisi", "Sonrasında konuşacak çok şeyiniz olur."],
+  ["Bisiklet turu", "Şehri ya da sahili farklı bir hızda keşfedin."],
+  ["Gece pikniği", "Battaniye, atıştırmalık ve açık gökyüzü yeter."],
+  ["Dans dersi", "İkiniz de acemi olduğu için kahkaha garanti."]
+];
+const moments = [
+  ["Yıldız izleme pikniği", "Şehir dışına çıkıp bir battaniye sermek yeterli."],
+  ["Ev sinema gecesi", "Işıkları kısıp ilk buluşmanızda izlediğiniz filmi tekrar açın."],
+  ["Gün batımı yürüyüşü", "Plan yapmadan, sadece elini tutup yürümek."],
+  ["Birlikte kahvaltı hazırlama", "Sabahı acele etmeden, mutfakta birlikte geçirin."],
+  ["Sürpriz not bırakma", "Çantasına, ayakkabısına ya da aynaya küçük bir not."]
+];
+
+const mekanlar = {
+  "Manzaralı akşam yemeği": [
+    { name:"Hanzade Bosphorus Restaurant", area:"Sirkeci, Fatih", rating:4.8, ratingCount:17957, price:"₺₺", yogunluk:"Hafta sonu akşamları oldukça yoğun, hafta içi daha sakin.", ulasim:"Sirkeci tren garına yürüme mesafesinde, tramvay hattına yakın.", desc:"İskelede, Boğaz manzaralı bir tekne restoranı; özel günlerde pasta sürprizi de yapabiliyorlar.", place_id:"ChIJeyzSOYS5yhQRZGbHU6N19lI" },
+    { name:"Glamour Rooftop Restaurant", area:"Sirkeci, Fatih", rating:4.9, ratingCount:2273, price:"₺₺₺", yogunluk:"Akşam saatlerinde rezervasyonsuz yer bulmak zor olabilir.", ulasim:"Sirkeci merkezine yakın, biraz yokuş yürüyüş gerekiyor.", desc:"Şehir manzaralı çatı katı, doğum günü gibi özel anlar için uygun bir atmosfer.", place_id:"ChIJeXhd0Wq5yhQRzsg41zmESA8" },
+    { name:"Luco Restaurant Rooftop Sirkeci", area:"Sirkeci, Fatih", rating:4.9, ratingCount:2604, price:"₺₺", yogunluk:"Gün batımı saatinde en kalabalık.", ulasim:"Sirkeci merkezinde, toplu taşımaya yakın.", desc:"Cami ve gün batımı manzaralı çatı katı; porsiyonlar geniş, fiyatlar makul bulunuyor.", place_id:"ChIJsYslLXe5yhQRxkEC4RsjM-s" }
+  ],
+  "Manzaralı kahve": [
+    { name:"The Haliç Bosphorus Cafe", area:"Fatih", rating:4.5, ratingCount:1771, price:"₺₺", yogunluk:"Öğleden sonraları yoğunlaşıyor.", ulasim:"Fatih'in eski dokusunda, taksiyle ya da yürüyerek ulaşılabilir.", desc:"Taş kemerli, Galata Kulesi manzaralı sakin bir kahve molası mekanı.", place_id:"ChIJg09ojfK5yhQRstECj99vZqI" },
+    { name:"Giriftar Cafe", area:"Fatih", rating:4.5, ratingCount:5136, price:"₺₺", yogunluk:"Hafta sonu terası hızlı doluyor.", ulasim:"Şehir merkezine yakın, yürüyüşle ulaşılabilir.", desc:"Teraslı, şık bir mekan; mercimek çorbası ve makarnaları beğeniliyor.", place_id:"ChIJs54yDu25yhQRXKKxVXNEGCM" },
+    { name:"Sade Kahve", area:"Rumeli Hisarı, Sarıyer", rating:4.1, ratingCount:1124, price:"₺₺", yogunluk:"Hafta sonu kahvaltıları için sıra olabiliyor, hafta içi sabahları sakin.", ulasim:"Boğaz kıyısında, özel araç ya da taksiyle rahat ulaşım.", desc:"Boğaz manzaralı, ev yapımı tadında klasik Türk kahvaltısı sunan sakin bir yer.", place_id:"ChIJcfnQRQPKyhQRvczE7HYX85Q" }
+  ],
+  "Gündüz buluşması": [
+    { name:"Choco Port Kadıköy", area:"Kadıköy", rating:4.2, ratingCount:2474, price:"₺₺", yogunluk:"Hafta sonu aileler yüzünden gürültülü ve kalabalık olabiliyor.", ulasim:"Kadıköy merkezinde, vapur iskelesine yürüme mesafesinde.", desc:"Tatlı ağırlıklı, sevimli dekorlu bir kafe; pankek ve milkshake çeşitleri öne çıkıyor.", place_id:"ChIJkwXHIC25yhQRvgfNkNm7N-Q" },
+    { name:"Mum's Cafe", area:"Karaköy, Beyoğlu", rating:4.1, ratingCount:2954, price:"₺₺", yogunluk:"Kahvaltı saatlerinde genelde dolu.", ulasim:"Karaköy'de, tramvay durağına yakın.", desc:"Avrupa esintili, sakin ve samimi bir kahvaltı-kafe mekanı.", place_id:"ChIJATAfU9y5yhQRh4xXBn49Nn0" },
+    { name:"Varuna Gezgin Cafe", area:"Karaköy, Beyoğlu", rating:4.5, ratingCount:4548, price:"₺₺", yogunluk:"Akşamları maç yayınları olduğunda kalabalıklaşıyor.", ulasim:"Karaköy sahilinde, toplu taşımaya yakın.", desc:"Boğaz manzaralı, dünya mutfağından kahvaltı seçenekleri sunan sıcak bir mekan.", place_id:"ChIJFyIWheC5yhQRkDn-bxW9KCU" }
+  ],
+  "Aktivite ve eğlence": [
+    { name:"Arcade Tigers", area:"Taksim, Beyoğlu", rating:4.4, ratingCount:303, price:"₺₺", yogunluk:"Akşamları ve hafta sonu yoğunlaşıyor.", ulasim:"İstiklal Caddesi üzerinde, metro ve tramvaya çok yakın.", desc:"Bowling, atari ve yemek alanının bir arada olduğu eğlenceli bir buluşma noktası.", place_id:"ChIJ5dwVJy23yhQRG4tS-51qS0w" },
+    { name:"Bowling Alley Taksim", area:"Taksim, Beyoğlu", rating:4.0, ratingCount:641, price:"₺₺", yogunluk:"İstiklal Caddesi'nde olduğu için her saat kalabalık olabilir.", ulasim:"Taksim meydanına yürüme mesafesinde.", desc:"Bowling, bilardo ve atari makineleriyle rahat bir eğlence molası.", place_id:"ChIJucsy2yS3yhQRtNtPOvqPIks" }
+  ],
+  "Canlı müzik ve gece hayatı": [
+    { name:"Ritim Roof", area:"Beyoğlu", rating:4.6, ratingCount:3793, price:"₺₺", yogunluk:"Hafta sonu geceleri oldukça kalabalık, dans etmek isteyenler için ideal.", ulasim:"İstiklal Caddesi'ne yakın, taksi veya metro ile ulaşım kolay.", desc:"Enerjik müzikli, dans edilebilir bir çatı katı mekanı.", place_id:"ChIJaw0zkGC3yhQR8O91eC0OZxk" },
+    { name:"The Bite", area:"Beyoğlu", rating:4.1, ratingCount:1015, price:"₺₺", yogunluk:"Canlı grup olan akşamlar hızla dolabiliyor.", ulasim:"Beyoğlu'nun merkezinde, yürüyerek ulaşılabilir.", desc:"Canlı rock müzik dinlemek için samimi, atmosferik bir bar.", place_id:"ChIJo8OS5WC3yhQRa06x-Knhi6U" }
+  ],
+  "Kültür ve sanat": [
+    { name:"Salt Beyoğlu", area:"Beyoğlu", rating:4.6, ratingCount:1168, price:"Ücretsiz", yogunluk:"Hafta sonu öğleden sonraları daha kalabalık.", ulasim:"İstiklal Caddesi üzerinde, tramvaya yakın.", desc:"Sergi, kitapçı ve kafesiyle sakin bir kültür molası; girişi ücretsiz.", place_id:"ChIJT3JZAGC3yhQR_dj-LYbB5bY" },
+    { name:"Tophane-i Amire Kültür ve Sanat Merkezi", area:"Tophane, Beyoğlu", rating:4.7, ratingCount:1377, price:"Ücretsiz", yogunluk:"Genelde sakin, özel sergilerde kalabalıklaşabiliyor.", ulasim:"Tophane tramvay durağına yakın.", desc:"Tarihi bir Osmanlı yapısında değişen sergilerle dolu bir sanat mekanı.", place_id:"ChIJY02kxt65yhQRW94z93iNTCA" },
+    { name:"Dolmabahçe Sanat Galerisi", area:"Beşiktaş", rating:4.8, ratingCount:42, price:"₺", yogunluk:"Hafta sonu bahçesi ve kafesi kalabalıklaşıyor.", ulasim:"Beşiktaş sahiline yakın, otobüs ve vapur bağlantısı var.", desc:"Müze, sergi alanı ve manzaralı bahçe kafesiyle sakin bir gezinti.", place_id:"ChIJFQMy-nW3yhQRPFjI1lZpVgk" }
+  ],
+  "Tatlı molası": [
+    { name:"Meşhur Dondurmacı Ali Usta", area:"Moda, Kadıköy", rating:4.1, ratingCount:8193, price:"₺", yogunluk:"Yaz akşamları oldukça kalabalık.", ulasim:"Moda sahiline yakın, vapur iskelesinden yürünebilir.", desc:"Klasik bir Kadıköy durağı; meyveli dondurma çeşitleri öne çıkıyor.", place_id:"ChIJYeiKrYq4yhQRzyX21nSMAnY" },
+    { name:"Paseo Gelato & Sorbet", area:"Erenköy, Kadıköy", rating:4.7, ratingCount:1234, price:"₺₺", yogunluk:"Akşamları yoğunlaşabiliyor.", ulasim:"Erenköy'ün merkezinde, toplu taşımaya yakın.", desc:"İtalyan usulü, yoğun kıvamlı gelato çeşitleriyle küçük bir tatlı molası.", place_id:"ChIJETP2TdbHyhQRNFn4XozruBE" },
+    { name:"Damla Dondurma Boza", area:"Kurtuluş, Şişli", rating:4.7, ratingCount:850, price:"₺", yogunluk:"Nostaljik bir esnaf dükkanı, genelde sakin.", ulasim:"Kurtuluş Caddesi üzerinde, minibüs hattına yakın.", desc:"Eski usul, el yapımı dondurmasıyla nostaljik bir duraktır.", place_id:"ChIJPVOsrhS3yhQRnMI9Ahg3kyM" }
+  ]
+};
+
+const giftItems = [
+  { title:"El yazısı mektup", desc:"Aklından geçenleri kağıda dök; dijital çağda çok değerli bir jest.", tags:["sanat","kitap"], budget:"düşük" },
+  { title:"Kişisel çalma listesi + küçük hoparlör", desc:"İkinizin şarkılarından oluşan bir liste, taşınabilir bir hoparlörle.", tags:["müzik"], budget:"orta" },
+  { title:"Fotoğraf kolajı veya çerçeve", desc:"Birlikte çektiğiniz fotoğraflardan küçük bir albüm.", tags:["sanat"], budget:"düşük" },
+  { title:"Sevdiği kitabın özel baskısı", desc:"Okumak istediğini söylediği ama almadığı bir kitap.", tags:["kitap"], budget:"düşük" },
+  { title:"Kişiye özel takı", desc:"İsim, tarih ya da koordinat işlenmiş, kalıcı bir hediye.", tags:["moda"], budget:"yüksek" },
+  { title:"Sevdiği parfüm", desc:"Zaten kullandığı bir marka varsa şaşırtmaz ama sevindirir.", tags:["moda","güzellik"], budget:"yüksek" },
+  { title:"Cilt bakım seti", desc:"Sevdiği markadan küçük bir bakım rutini seti.", tags:["güzellik"], budget:"orta" },
+  { title:"Konser veya etkinlik bileti", desc:"Birlikte gidilecek bir plan, tek başına eşyadan daha değerli.", tags:["müzik","sanat"], budget:"orta" },
+  { title:"Yeni bir kulaklık veya aksesuar", desc:"Günlük kullandığı teknolojiyi iyileştiren pratik bir hediye.", tags:["teknoloji"], budget:"yüksek" },
+  { title:"Akıllı saat kayışı veya telefon aksesuarı", desc:"Küçük ama sürekli kullanacağı teknoloji dokunuşu.", tags:["teknoloji"], budget:"orta" },
+  { title:"Tırmanış veya sürüş dersi", desc:"İkinizin de ilk kez deneyeceği yeni bir spor aktivitesi.", tags:["spor","doğa"], budget:"orta" },
+  { title:"Kaliteli spor ekipmanı", desc:"Yaptığı spora uygun bir aksesuar ya da kıyafet.", tags:["spor"], budget:"orta" },
+  { title:"Bitki veya mini bahçe seti", desc:"Zamanla büyüyen, bakım isteyen bir hediye.", tags:["doğa"], budget:"düşük" },
+  { title:"Doğa yürüyüşü + kamp seti", desc:"Bir günlük doğa kaçamağı için gerekli küçük ekipman.", tags:["doğa","spor"], budget:"orta" },
+  { title:"Yeni bir oyun veya oyun konsolu aksesuarı", desc:"Sevdiği platforma uygun bir oyun ya da aksesuar.", tags:["oyun","teknoloji"], budget:"orta" },
+  { title:"Board game gecesi seti", desc:"Birlikte oynayabileceğiniz bir kutu oyunu.", tags:["oyun"], budget:"düşük" },
+  { title:"Yemek pişirme kursuna kayıt", desc:"Birlikte yeni bir mutfak öğrenmek hem hediye hem plan.", tags:["yemek"], budget:"orta" },
+  { title:"Gurme atıştırmalık kutusu", desc:"Sevdiği lezzetlerden oluşan özel bir kutu.", tags:["yemek"], budget:"düşük" },
+  { title:"Güzel bir akşam yemeği rezervasyonu", desc:"Sürpriz bir mekan seçip detayları sen halledebilirsin.", tags:["yemek","sanat"], budget:"yüksek" },
+  { title:"Ev spa günü seti", desc:"Mumlar, maskeler, sıcak bir banyo — evde küçük bir kaçamak.", tags:["güzellik"], budget:"düşük" },
+  { title:"Kişiye özel skecthbook ve boya seti", desc:"Sanatla ilgileniyorsa kendi tarzında bir çizim/boyama seti.", tags:["sanat"], budget:"düşük" },
+  { title:"Plak veya kaset koleksiyonuna katkı", desc:"Sevdiği bir sanatçının plağı, müzik zevkine özel bir hediye.", tags:["müzik"], budget:"orta" },
+  { title:"E-kitap okuyucu", desc:"Çok kitap okuyorsa hayatını kolaylaştıracak bir hediye.", tags:["kitap","teknoloji"], budget:"yüksek" },
+  { title:"Kişiye özel spor takip saati", desc:"Aktif bir yaşam sürüyorsa günlük kullanacağı pratik bir hediye.", tags:["spor","teknoloji"], budget:"yüksek" },
+  { title:"Mini kamp / doğa fotoğrafçılığı seti", desc:"Doğa ve fotoğrafla ilgileniyorsa birlikte kullanabileceğiniz bir set.", tags:["doğa","sanat"], budget:"orta" },
+  { title:"Makyaj fırçası veya organizer seti", desc:"Güzellik rutinine küçük ama işlevsel bir katkı.", tags:["güzellik","moda"], budget:"düşük" },
+  { title:"Kişiye özel yemek tarifi defteri", desc:"İkinizin tariflerini topladığınız, zamanla büyüyen bir defter.", tags:["yemek","sanat"], budget:"düşük" },
+  { title:"Oyun konsolu gecesi organizasyonu", desc:"Sevdiği oyunlarla dolu, atıştırmalıklı bir ev gecesi planla.", tags:["oyun","yemek"], budget:"düşük" }
+];
+const interestTags = ["kitap","spor","moda","teknoloji","sanat","güzellik","oyun","doğa","müzik","yemek"];
+const budgetLevels = ["düşük","orta","yüksek"];
+
+const cycleTips = [
+  ["Sabırlı ol", "Bu dönemde daha alıngan ya da yorgun hissedebilir, bunu kişisel algılamamaya çalış."],
+  ["Sıcak bir şeyler hazırla", "Sıcak su torbası ya da bir bardak sıcak çay küçük ama anlamlı bir jest olur."],
+  ["Alan bırak ama uzaklaşma", "Ne istediğini sorup ona göre davran; bazen yalnız kalmak, bazen sarılmak isteyebilir."],
+  ["Ağrı kesici veya ilaç önerme", "İlaç ve dozaj konusunda tavsiye vermek yerine kendi doktoruna danışmasını öner."],
+  ["Atıştırmalık bulundur", "Sevdiği çikolata ya da atıştırmalıklardan evde bulunsun."],
+  ["Ağır aktiviteler yerine hafifini öner", "Yoğun spor yerine kısa bir yürüyüş ya da dinlenme önerebilirsin."],
+  ["Gereksiz şaka yapma", "Bu dönemle ilgili espri yapmak, ne kadar masum olsa da geri tepebilir."],
+  ["Sadece dinle", "Bazen çözüm değil, sadece dinleyen biri yeterlidir."]
+];
+
+const groupColors = {
+  "Günaydın mesajları": "var(--amber-deep)",
+  "İyi geceler mesajları": "var(--dusk-deep)",
+  "İltifatlar": "var(--rose-deep)",
+  "Sohbet açıcılar": "var(--teal-deep)"
+};
+const mekanCatColors = {
+  "Manzaralı akşam yemeği": "var(--coral)",
+  "Manzaralı kahve": "var(--amber)",
+  "Gündüz buluşması": "var(--dawn)",
+  "Aktivite ve eğlence": "var(--teal)",
+  "Canlı müzik ve gece hayatı": "var(--lavender)",
+  "Kültür ve sanat": "var(--dusk)",
+  "Tatlı molası": "var(--rose)"
+};
+
+const modeConfig = {
+  gunaydin: { pool: gunaydin, eyebrow: 'Günaydın mesajı', notifTitle: 'Günaydın mesajı zamanı', timeKey: 'morningTime', notifKey: 'notifiedGunaydin', streakEl: 'streakGunaydin' },
+  gunici:   { pool: gunIci,   eyebrow: 'Hadi ona şunu söyle',  notifTitle: 'Gün içi hatırlatma — hadi ona şunu söyle', timeKey: 'dayTime', notifKey: 'notifiedGunici', streakEl: 'streakGunici' },
+  iyigece:  { pool: iyigeceler, eyebrow: 'İyi geceler mesajı', notifTitle: 'İyi geceler mesajı zamanı', timeKey: 'nightTime', notifKey: 'notifiedIyigece', streakEl: 'streakIyigece' }
+};
+const defaultSettings = { morningTime:"08:00", dayTime:"14:00", nightTime:"22:00", notifEnabled:false, notifiedGunaydin:null, notifiedGunici:null, notifiedIyigece:null };
+const defaultStreaks = { gunaydin: { count: 0, last: null }, gunici: { count: 0, last: null }, iyigece: { count: 0, last: null } };
+
+let state = {
+  favorites: [],
+  streaks: JSON.parse(JSON.stringify(defaultStreaks)),
+  todayIndex: { gunaydin: 0, gunici: 0, iyigece: 0 },
+  settings: Object.assign({}, defaultSettings),
+  specialDays: [],
+  cycle: null,
+  giftSelection: { interests: [], budget: null }
+};
+
+async function loadState(){
+  try{
+    const r = await window.storage.get('unutma-state', false);
+    if(r && r.value){
+      const parsed = JSON.parse(r.value);
+      state = Object.assign(state, parsed);
+      state.settings = Object.assign({}, defaultSettings, parsed.settings || {});
+      state.streaks = Object.assign({}, defaultStreaks, parsed.streaks || {});
+      state.todayIndex = Object.assign({ gunaydin:0, gunici:0, iyigece:0 }, parsed.todayIndex || {});
+    }
+  }catch(e){}
+  render();
+}
+async function saveState(){
+  try{ await window.storage.set('unutma-state', JSON.stringify(state), false); }catch(e){}
+}
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function daysBetween(a,b){ return Math.round((new Date(b) - new Date(a)) / 86400000); }
+function currentMode(){
+  const h = new Date().getHours();
+  if(h >= 5 && h < 11) return 'gunaydin';
+  if(h >= 11 && h < 18) return 'gunici';
+  return 'iyigece';
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._tid);
+  showToast._tid = setTimeout(()=> t.classList.remove('show'), 1800);
+}
+
+function renderBugun(){
+  const mode = currentMode();
+  const cfg = modeConfig[mode];
+  document.getElementById('bugunEyebrow').textContent = cfg.eyebrow;
+  const idx = state.todayIndex[mode] % cfg.pool.length;
+  const text = cfg.pool[idx];
+  document.getElementById('bugunMesaj').textContent = text;
+  const favBtn = document.getElementById('btnFavToday');
+  favBtn.classList.toggle('active', state.favorites.includes(text));
+  favBtn.textContent = state.favorites.includes(text) ? '♥' : '♡';
+  document.getElementById('streakGunaydin').textContent = state.streaks.gunaydin.count;
+  document.getElementById('streakGunici').textContent = state.streaks.gunici.count;
+  document.getElementById('streakIyigece').textContent = state.streaks.iyigece.count;
+  document.getElementById('morningTime').value = state.settings.morningTime;
+  document.getElementById('dayTime').value = state.settings.dayTime;
+  document.getElementById('nightTime').value = state.settings.nightTime;
+  const accentMap = { gunaydin:'var(--amber)', gunici:'var(--coral)', iyigece:'var(--dusk)' };
+  document.getElementById('bugunCard').style.setProperty('--card-accent', accentMap[mode]);
+  updateNotifStatus();
+}
+
+document.getElementById('btnShuffle').addEventListener('click', ()=>{
+  const mode = currentMode();
+  const pool = modeConfig[mode].pool;
+  let next;
+  do{ next = Math.floor(Math.random()*pool.length); }while(next === state.todayIndex[mode] && pool.length>1);
+  state.todayIndex[mode] = next;
+  renderBugun();
+  saveState();
+});
+document.getElementById('btnCopy').addEventListener('click', ()=>{
+  const text = document.getElementById('bugunMesaj').textContent;
+  navigator.clipboard.writeText(text).then(()=> showToast('Kopyalandı')).catch(()=> showToast('Kopyalanamadı'));
+});
+document.getElementById('btnFavToday').addEventListener('click', ()=>{
+  toggleFavorite(document.getElementById('bugunMesaj').textContent);
+  renderBugun();
+});
+document.getElementById('btnSent').addEventListener('click', ()=>{
+  const mode = currentMode();
+  const s = state.streaks[mode];
+  const today = todayStr();
+  if(s.last === today){ showToast('Bugün için zaten işaretledin'); return; }
+  if(s.last && daysBetween(s.last, today) === 1){ s.count += 1; } else { s.count = 1; }
+  s.last = today;
+  saveState();
+  renderBugun();
+  showToast('Kaydedildi, seri devam ediyor');
+});
+
+document.getElementById('morningTime').addEventListener('change', e=>{ state.settings.morningTime = e.target.value; saveState(); });
+document.getElementById('dayTime').addEventListener('change', e=>{ state.settings.dayTime = e.target.value; saveState(); });
+document.getElementById('nightTime').addEventListener('change', e=>{ state.settings.nightTime = e.target.value; saveState(); });
+function updateNotifStatus(){
+  const el = document.getElementById('notifStatus');
+  const btn = document.getElementById('btnNotif');
+  if(!('Notification' in window)){
+    el.textContent = 'Bu tarayıcı bildirimleri desteklemiyor.';
+    btn.disabled = true;
+    return;
+  }
+  if(Notification.permission === 'granted' && state.settings.notifEnabled){
+    el.textContent = 'Bildirimler açık.';
+    btn.textContent = 'Bildirimleri kapat';
+  } else {
+    el.textContent = Notification.permission === 'denied' ? 'Tarayıcı izni engellendi.' : 'Bildirimler kapalı.';
+    btn.textContent = 'Bildirimleri aç';
+  }
+}
+document.getElementById('btnNotif').addEventListener('click', async ()=>{
+  if(state.settings.notifEnabled){
+    state.settings.notifEnabled = false;
+    saveState();
+    updateNotifStatus();
+    return;
+  }
+  if(Notification.permission === 'granted'){
+    state.settings.notifEnabled = true;
+  } else {
+    const perm = await Notification.requestPermission();
+    state.settings.notifEnabled = perm === 'granted';
+  }
+  saveState();
+  updateNotifStatus();
+});
+function checkReminders(){
+  if(!state.settings.notifEnabled || Notification.permission !== 'granted') return;
+  const now = new Date();
+  const hhmm = now.toTimeString().slice(0,5);
+  const today = todayStr();
+  Object.keys(modeConfig).forEach(mode=>{
+    const cfg = modeConfig[mode];
+    if(hhmm === state.settings[cfg.timeKey] && state.settings[cfg.notifKey] !== today){
+      new Notification(cfg.notifTitle, { body: cfg.pool[state.todayIndex[mode] % cfg.pool.length] });
+      state.settings[cfg.notifKey] = today;
+      saveState();
+    }
+  });
+}
+
+function toggleFavorite(text){
+  const i = state.favorites.indexOf(text);
+  if(i >= 0){ state.favorites.splice(i,1); } else { state.favorites.push(text); }
+  saveState();
+  renderLibrary();
+  renderFavorites();
+}
+function renderLibrary(){
+  const groups = [
+    ['Günaydın mesajları', gunaydin],
+    ['İyi geceler mesajları', iyigeceler],
+    ['İltifatlar', iltifat],
+    ['Sohbet açıcılar', sohbet]
+  ];
+  const container = document.getElementById('libraryContainer');
+  container.innerHTML = '';
+  groups.forEach(([title, list])=>{
+    const h = document.createElement('p');
+    h.className = 'section-title';
+    h.innerHTML = `<span class="dot" style="background:${groupColors[title]}"></span>${title}`;
+    container.appendChild(h);
+    const card = document.createElement('div');
+    card.className = 'card';
+    list.forEach(text=>{
+      const row = document.createElement('div');
+      row.className = 'lib-item';
+      const p = document.createElement('p');
+      p.textContent = text;
+      const actions = document.createElement('div');
+      actions.className = 'lib-actions';
+      const heart = document.createElement('button');
+      heart.className = 'ghost icon-only heart-btn' + (state.favorites.includes(text) ? ' active' : '');
+      heart.textContent = state.favorites.includes(text) ? '♥' : '♡';
+      heart.setAttribute('aria-label','Favorile');
+      heart.addEventListener('click', ()=> toggleFavorite(text));
+      const copy = document.createElement('button');
+      copy.className = 'ghost icon-only';
+      copy.textContent = '⧉';
+      copy.setAttribute('aria-label','Kopyala');
+      copy.addEventListener('click', ()=>{ navigator.clipboard.writeText(text).then(()=> showToast('Kopyalandı')); });
+      actions.appendChild(heart);
+      actions.appendChild(copy);
+      row.appendChild(p);
+      row.appendChild(actions);
+      card.appendChild(row);
+    });
+    container.appendChild(card);
+  });
+}
+function renderFavorites(){
+  const container = document.getElementById('favContainer');
+  container.innerHTML = '';
+  if(state.favorites.length === 0){
+    container.innerHTML = '<div class="card empty"><p>Henüz favori mesajın yok.</p><p>Mesajlar sekmesinden kalp ikonuna dokunarak ekleyebilirsin.</p></div>';
+    return;
+  }
+  const card = document.createElement('div');
+  card.className = 'card';
+  state.favorites.forEach(text=>{
+    const row = document.createElement('div');
+    row.className = 'lib-item';
+    const p = document.createElement('p');
+    p.textContent = text;
+    const actions = document.createElement('div');
+    actions.className = 'lib-actions';
+    const remove = document.createElement('button');
+    remove.className = 'ghost icon-only';
+    remove.textContent = '✕';
+    remove.setAttribute('aria-label','Kaldır');
+    remove.addEventListener('click', ()=> toggleFavorite(text));
+    const copy = document.createElement('button');
+    copy.className = 'ghost icon-only';
+    copy.textContent = '⧉';
+    copy.setAttribute('aria-label','Kopyala');
+    copy.addEventListener('click', ()=>{ navigator.clipboard.writeText(text).then(()=> showToast('Kopyalandı')); });
+    actions.appendChild(copy);
+    actions.appendChild(remove);
+    row.appendChild(p);
+    row.appendChild(actions);
+    card.appendChild(row);
+  });
+  container.appendChild(card);
+}
+
+function renderMekan(){
+  const cats = Object.keys(mekanlar);
+  const wrap = document.getElementById('mekanCats');
+  wrap.innerHTML = '';
+  let active = renderMekan._active || cats[0];
+  function renderList(){
+    renderMekan._active = active;
+    const list = document.getElementById('mekanList');
+    list.innerHTML = '';
+    mekanlar[active].forEach(p=>{
+      const div = document.createElement('div');
+      div.className = 'place-card';
+      div.innerHTML = `
+        <div class="place-title"><h3>${p.name}</h3><span class="place-rating">★ ${p.rating}</span></div>
+        <div class="place-meta">
+          <span class="meta-pill">${p.area}</span>
+          <span class="meta-pill">${p.price}</span>
+          <span class="meta-pill">${p.ratingCount.toLocaleString('tr-TR')} değerlendirme</span>
+        </div>
+        <p class="place-desc">${p.desc}</p>
+        <p class="place-desc"><b>Yoğunluk:</b> ${p.yogunluk}</p>
+        <p class="place-desc"><b>Ulaşım:</b> ${p.ulasim}</p>
+        <a class="place-link" href="https://www.google.com/maps/place/?q=place_id:${p.place_id}" target="_blank" rel="noopener">Haritada gör ↗</a>
+      `;
+      list.appendChild(div);
+    });
+    [...wrap.children].forEach(c=>{
+      const isActive = c.dataset.cat === active;
+      c.classList.toggle('active', isActive);
+      c.style.setProperty('--pill-accent', mekanCatColors[c.dataset.cat] || 'var(--dusk)');
+    });
+  }
+  cats.forEach(cat=>{
+    const pill = document.createElement('div');
+    pill.className = 'cat-pill';
+    pill.dataset.cat = cat;
+    pill.textContent = cat;
+    pill.addEventListener('click', ()=>{ active = cat; renderList(); });
+    wrap.appendChild(pill);
+  });
+  renderList();
+}
+
+function renderGiftForm(){
+  const intWrap = document.getElementById('giftInterests');
+  intWrap.innerHTML = '';
+  interestTags.forEach(tag=>{
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (state.giftSelection.interests.includes(tag) ? ' active' : '');
+    chip.textContent = tag;
+    chip.addEventListener('click', ()=>{
+      const i = state.giftSelection.interests.indexOf(tag);
+      if(i>=0) state.giftSelection.interests.splice(i,1); else state.giftSelection.interests.push(tag);
+      saveState();
+      renderGiftForm();
+    });
+    intWrap.appendChild(chip);
+  });
+  const budgetWrap = document.getElementById('giftBudget');
+  budgetWrap.innerHTML = '';
+  budgetLevels.forEach(b=>{
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (state.giftSelection.budget === b ? ' active' : '');
+    chip.textContent = b;
+    chip.addEventListener('click', ()=>{
+      state.giftSelection.budget = state.giftSelection.budget === b ? null : b;
+      saveState();
+      renderGiftForm();
+    });
+    budgetWrap.appendChild(chip);
+  });
+}
+document.getElementById('btnGiftSuggest').addEventListener('click', ()=>{
+  const name = document.getElementById('giftName').value.trim();
+  const age = document.getElementById('giftAge').value.trim();
+  let results = giftItems.filter(g=>{
+    const interestMatch = state.giftSelection.interests.length === 0 || g.tags.some(t=> state.giftSelection.interests.includes(t));
+    const budgetMatch = !state.giftSelection.budget || g.budget === state.giftSelection.budget;
+    return interestMatch && budgetMatch;
+  });
+  if(results.length === 0) results = giftItems.slice(0,4);
+  const heading = name ? `${name}${age ? ' (' + age + ' yaş)' : ''} için öneriler` : 'Öneriler';
+  const container = document.getElementById('giftResults');
+  container.innerHTML = `<p class="section-title">${heading}</p><div class="card">` +
+    results.map(g=> `<div class="idea-item"><b>${g.title}</b> <span class="gift-badge">${g.budget} bütçe</span><br>${g.desc}</div>`).join('') +
+    '</div>';
+});
+
+function computeNextOccurrence(dateStr){
+  const d = new Date(dateStr + 'T00:00:00');
+  const now = new Date();
+  const thisYear = new Date(now.getFullYear(), d.getMonth(), d.getDate());
+  let next = thisYear;
+  if(thisYear < new Date(now.getFullYear(), now.getMonth(), now.getDate())){
+    next = new Date(now.getFullYear()+1, d.getMonth(), d.getDate());
+  }
+  return { next, daysLeft: daysBetween(todayStr(), next.toISOString().slice(0,10)) };
+}
+document.getElementById('btnAddDay').addEventListener('click', ()=>{
+  const title = document.getElementById('dayTitle').value.trim();
+  const date = document.getElementById('dayDate').value;
+  if(!title || !date){ showToast('Başlık ve tarih gerekli'); return; }
+  state.specialDays.push({ id: Date.now().toString(), title, date });
+  document.getElementById('dayTitle').value = '';
+  document.getElementById('dayDate').value = '';
+  saveState();
+  renderDays();
+});
+function renderDays(){
+  const container = document.getElementById('daysContainer');
+  if(state.specialDays.length === 0){
+    container.innerHTML = '<div class="card empty"><p>Henüz özel gün eklemedin.</p><p>Doğum günü, ilk buluşma ya da yıl dönümü ekleyerek başla.</p></div>';
+    return;
+  }
+  const withDays = state.specialDays.map(d=> Object.assign({}, d, computeNextOccurrence(d.date)));
+  withDays.sort((a,b)=> a.daysLeft - b.daysLeft);
+  const card = document.createElement('div');
+  card.className = 'card';
+  withDays.forEach(d=>{
+    const row = document.createElement('div');
+    row.className = 'day-row';
+    const orig = new Date(d.date + 'T00:00:00');
+    row.innerHTML = `
+      <div class="info">
+        <p class="t">${d.title}</p>
+        <p class="d">${orig.toLocaleDateString('tr-TR', {day:'numeric', month:'long'})}</p>
+      </div>
+      <div class="countdown">${d.daysLeft === 0 ? 'Bugün!' : d.daysLeft}<span class="u">${d.daysLeft === 0 ? '' : 'gün kaldı'}</span></div>
+    `;
+    const del = document.createElement('button');
+    del.className = 'ghost icon-only';
+    del.textContent = '✕';
+    del.setAttribute('aria-label','Sil');
+    del.style.marginLeft = '8px';
+    del.addEventListener('click', ()=>{
+      state.specialDays = state.specialDays.filter(x=> x.id !== d.id);
+      saveState();
+      renderDays();
+    });
+    row.appendChild(del);
+    card.appendChild(row);
+  });
+  container.innerHTML = '';
+  container.appendChild(card);
+}
+
+document.getElementById('btnCycleSave').addEventListener('click', ()=>{
+  const start = document.getElementById('cycleStart').value;
+  const length = parseInt(document.getElementById('cycleLength').value) || 28;
+  const period = parseInt(document.getElementById('periodLength').value) || 5;
+  if(!start){ showToast('Başlangıç tarihi gerekli'); return; }
+  state.cycle = { start, length, period };
+  saveState();
+  renderCycle();
+  showToast('Kaydedildi');
+});
+function renderCycle(){
+  const tipsContainer = document.getElementById('cycleTips');
+  tipsContainer.innerHTML = cycleTips.map(([t,d])=> `<div class="idea-item"><b>${t}</b><br>${d}</div>`).join('');
+  const statusContainer = document.getElementById('cycleStatus');
+  if(!state.cycle){
+    statusContainer.innerHTML = '';
+    return;
+  }
+  document.getElementById('cycleStart').value = state.cycle.start;
+  document.getElementById('cycleLength').value = state.cycle.length;
+  document.getElementById('periodLength').value = state.cycle.period;
+  const start = new Date(state.cycle.start + 'T00:00:00');
+  const now = new Date();
+  let daysSince = Math.floor((now - start) / 86400000);
+  const cycleDay = ((daysSince % state.cycle.length) + state.cycle.length) % state.cycle.length + 1;
+  const inPeriod = cycleDay <= state.cycle.period;
+  const cyclesPassed = Math.floor(daysSince / state.cycle.length);
+  const nextStart = new Date(start.getTime() + (cyclesPassed + 1) * state.cycle.length * 86400000);
+  let daysToNext = Math.round((nextStart - now) / 86400000);
+  if(daysToNext < 0) daysToNext += state.cycle.length;
+  statusContainer.innerHTML = `
+    <div class="cycle-status ${inPeriod ? '' : 'calm'}">
+      <h3>${inPeriod ? 'Şu an regl haftası olabilir' : 'Regl döneminde değil'}</h3>
+      <p>${inPeriod ? 'Döngünün ' + cycleDay + '. günü. Bu hafta biraz daha nazik ve anlayışlı olmakta fayda var.' : 'Tahmini bir sonraki regl döneminin başlangıcına ' + daysToNext + ' gün var.'}</p>
+    </div>
+  `;
+}
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=> t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=> p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+function renderSky(){
+  const now = new Date();
+  const h = now.getHours() + now.getMinutes()/60;
+  let top, bottom, bodyColor, label;
+  if(h >= 5 && h < 8){ top='#F3B587'; bottom='#F6D9B8'; bodyColor='#FFF3D6'; label='Sabahın erken saatleri'; }
+  else if(h >= 8 && h < 17){ top='#EFC896'; bottom='#F8E7CE'; bodyColor='#FFF8E4'; label='Gün içi'; }
+  else if(h >= 17 && h < 20){ top='#C97B84'; bottom='#E8A672'; bodyColor='#FFEBD1'; label='Akşamüstü'; }
+  else { top='#333A54'; bottom='#4B5372'; bodyColor='#E9E4D8'; label='Gece'; }
+  document.getElementById('dayPart').textContent = label;
+  const svg = document.getElementById('skyArc');
+  svg.innerHTML = `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="${top}"/><stop offset="100%" stop-color="${bottom}"/>
+  </linearGradient></defs><rect width="640" height="150" fill="url(#g)"/>`;
+  const progress = h / 24;
+  const cx = 60 + progress * 560;
+  const cy = 130 - Math.sin(progress * Math.PI) * 95;
+  const body = document.getElementById('skyBody');
+  body.style.left = cx + 'px';
+  body.style.top = cy + 'px';
+  body.style.background = bodyColor;
+}
+
+function render(){
+  renderBugun();
+  renderLibrary();
+  renderFavorites();
+  renderMekan();
+  renderGiftForm();
+  renderDays();
+  renderCycle();
+  renderSky();
+}
+
+loadState();
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+setInterval(renderSky, 60000);
+setInterval(checkReminders, 20000);
+</script>
+</body>
+</html>
